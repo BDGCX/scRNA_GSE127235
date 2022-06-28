@@ -21,14 +21,14 @@ DoHeatmap(sce,top10$gene,size=2,label = T,
           group.by = "new_clusters",angle = 0)+ scale_fill_gradientn(colors = c("blue", "white", "red"))
 
 #使用pheatmap对top10进行重新作图
-
-####方法1#####
 # 提取原始表达矩阵
 cts <- GetAssayData(sce, slot = "counts")
+#cts <- GetAssayData(sce, slot = "data")
 
 cts[1:4,1:4]
 # 然后对这个矩阵取log对数据进行标准化
-cts <- log10(cts +0.001)
+cts <- log10(cts +0.01)
+#cts <- scale(cts)
 
 #得到小的top10表达矩阵，矩阵的行就按基因名取
 #热图结果是按照cluster进行排序展示的，因此我们也要将小表达矩阵的列按cluster从小到大排序：
@@ -81,9 +81,11 @@ ac1 <- ac1[order(ac1[,1],ac1[2]),]
 
 # 提取原始表达矩阵
 cts <- GetAssayData(sce, slot = "counts")
+#cts <- GetAssayData(sce, slot = "data")
+
 cts[1:4,1:4]
 # 然后对这个矩阵取log对数据进行标准化
-#cts <- scale(cts,center = T,scale = T)
+#cts <- scale(cts)
 cts <- log10(cts +0.01)
 
 #有了行和列的规定，我们就能很轻松地提取出整个小的表达矩阵：
@@ -110,6 +112,7 @@ pheatmap(cts,show_colnames =F,show_rownames = T,
          cluster_cols = F,
          annotation_col=ac1
 )
+ggsave("heatmap.pdf",width = 3000,height = 1500,dpi = 400,units = "px")
 
 
 

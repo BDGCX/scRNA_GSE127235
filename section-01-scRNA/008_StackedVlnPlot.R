@@ -54,8 +54,6 @@ loompy <-  import("loompy")
 
 #方法二，，利用使用基于scanpy包衍生的scanyuan包来说实现，数据处理及流程同方法一
 
-
-
 #方法三，利用R函数实现单细胞StackedVlnPlot
 library(Seurat)
 library(ggplot2)
@@ -67,6 +65,7 @@ markers <- c("Cd300lg","Egfl7","Rasgrp3","Ptprb","Cyyr1", "Gpihbp1", "Ramp3",
              "Robo2","Mgat5")
 #1.直接使用VlnPlot函数的stack = T
 #使用CaseMatch去除不存在的基因
+library(limma)
 markers <- CaseMatch(markers,rownames(sce))
 markers <- as.character(markers)
 idents <- c("TC","IC","POD","MC","EC")
@@ -80,7 +79,8 @@ VlnPlot(sce,features = markers,
         #flip = T,转换x轴和y轴的位置
         stack = T)+NoLegend()
 ggsave("svp.png",width = 3000,height = 1700,dpi = 300,units = "px")
-#2.别人写好的函数
+
+#2.别人写好的函数(推荐此方法，与文献中绘图一致)
 ###载入需要的R包
 library(Seurat)
 library(dplyr)
@@ -122,8 +122,8 @@ plot_stacked_violin<-function(plotData,xlab,ylab,cols){
   ggplot(plotData,aes(y=xaxis,x=value,fill=cellID))+
     geom_violin()+
     theme_test()+
-    facet_grid(vars(gene), vars(cellID)#多图panel组合，第一和参数行分，第二个按列分
-               )+#右边的标签放左边
+    facet_grid(vars(gene), vars(cellID),#多图panel组合，第一和参数行分，第二个按列分
+    switch = "y")+#右边的标签放左边
     xlab(xlab)+
     ylab(ylab)+
     scale_fill_manual(values = cols)+
@@ -176,6 +176,7 @@ plotData$gene <- factor(plotData$gene,levels=c("Cd300lg","Egfl7","Rasgrp3","Ptpr
 plot_stacked_violin(plotData,"Expression (log-scale)"," ",colpalette)#空白处是y轴标签
 
 ggsave("Stackedviolin-ggplot2.png",width = 2500,height = 4000,dpi = 300,units = "px")
+
 #3.使用别人写好的函数
 #具体用法见https://divingintogeneticsandgenomics.rbind.io/post/stacked-violin-plot-for-visualizing-single-cell-data-in-seurat/
 modify_vlnplot <- function(obj, feature, pt.size = 0, plot.margin = unit(c(-0.75, 0, -0.75, 0), "cm"),...) {
