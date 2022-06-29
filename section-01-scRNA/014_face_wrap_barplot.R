@@ -61,7 +61,7 @@ ggplot(plotData1,aes(x=cell,y=value,fill=cellID))+
         strip.background.x = element_rect(fill=c("#8787FFFF","#6EE2FFFF"),colour = c("#8787FFFF","#6EE2FFFF"),size =0.5 ),
         strip.background.y = element_rect(fill = "transparent",colour = "white"),
         axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),#轴须标签，刻度线
+        #axis.ticks.x = element_blank(),#轴须标签，刻度线
         axis.ticks.y = element_blank(),
         panel.border = element_rect(size=0.6,colour = "black"),
         #strip.text.x  = element_text(margin =margin(0,0,0,0) ),
