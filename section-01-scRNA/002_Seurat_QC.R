@@ -6,6 +6,8 @@ load(file='./input.Rdata')
 
 library(pheatmap)
 library(ggplot2)
+library(loomR)
+library(SeuratDisk)
 
 fivenum(apply(counts,1,function(x) sum(x>0) ))
 boxplot(apply(counts,1,function(x) sum(x>0) ))
@@ -28,7 +30,11 @@ library(Seurat)
 #sce.meta <- data.frame(Patient_ID=group$Patient_ID,row.names = group$sample)
 #head(sce.meta)
 #table(sce.meta$Patient_ID)
-
+#使用scanpy建立Seurat对象后直接调至细胞周期评分
+sce <- CreateSeuratObject(counts = counts,
+                          meta.data =meta,
+                          project = "sce")
+#不使用scanpy
 #文献中(2) cells with <200 genes were excluded,(min.features) = 200
 sce <- CreateSeuratObject(counts = counts,
                          meta.data =meta,
@@ -103,6 +109,11 @@ g2m.genes <- Seurat::cc.genes.updated.2019$g2m.genes
 sce <- CellCycleScoring(sce, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
 # 查看细胞周期评分及分期（phase assignments）
 head(sce[[]])
+
+# seurat对象转换为loom文件,使用SeuratDisk包
+adata.loom <- as.loom(x = sce, filename = "C:/Users/bdgcx/OneDrive/python/scanpy/adata.loom", verbose = FALSE)
+# Always remember to close loom files when done
+adata.loom$close_all()
 # Visualize the distribution of cell cycle markers across
 #山峦图
 RidgePlot(sce, features = c("PCNA", "TOP2A", "MCM6", "MKI67"), ncol = 2)
