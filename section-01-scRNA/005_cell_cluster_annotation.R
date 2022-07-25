@@ -3,9 +3,34 @@
 #通过对比我们鉴定的marker gene与已发表的细胞类型特意的基因表达marker，可以定义我们划分出来的细胞类群。
 #最后，给我们定义好的细胞类群加上名称
 #参考细胞marker数据库：http://xteam.xbio.top/CellMarker/
+
+#寻找需要注释疾病细胞的相关文献作为参考，找到文中的marker基因(参考文献中注释的细胞类型)
+EC <- c("Flt1","Tie1","Pecam1", "Kdr","Emcn","Cdh5")
+MC <- c("Pdgfrb", "Gata3", "Des", "Itga8")
+POD <- c("Nphs1", "Nphs2", "Pdpn", "Wt1", 
+         "Mafb", "Synpo", "Cdkn1c", "Ptpro")
+IC <- c("Ptprc", "Lyz1", "Csf1r", "Itgam", "Cd3d", 
+        "Ms4a1","Lyz2","Cd74","H2-Aa")
+PEC <- c("Cldn1", "Pax8")
+SMC <- c("Acta2", "Myh11", "Tagln")
+TEC <- c("Fxyd2","Slc12a1", "Slc12a3", "Slc14a2","Aqp1",
+         "Aqp2","Umod","Atp1b1","Cdh16")
+#合并
+markers <- c(EC,MC,POD,IC,SMC,TEC,PEC)
+
+#使用CaseMatch去除不存在的基因
+markers <- CaseMatch(markers,rownames(sce))
+markers <- as.character(markers)
+
+#针对marker gene做点图
+DotPlot(sce, features = unique(markers),
+        group.by = "seurat_clusters")+RotatedAxis()+
+  scale_x_discrete("")+scale_y_discrete("")
+#根据点图对细胞群进行注释
 new.cluster.ids <- c("EC", "MC", "POD", "IC", "TC")
 names(new.cluster.ids) <- levels(sce)
 sce <- RenameIdents(sce, new.cluster.ids)
+sce$new_clusters <- sce@active.ident
 DimPlot(sce, reduction = "tsne",split.by = "treatment", 
         label = TRUE, pt.size = 1) + NoLegend()+
   theme(panel.background = element_rect(fill='white', colour='black'), 
@@ -52,7 +77,7 @@ cell_type
 #EC  IC  MC POD  TC 
 #200  77  43  18  20 
 
-#cell annotation-----网络教程
+#cell annotation-----自动注释
 # 对肿瘤细胞来说，分群后的细胞亚群注释是不可行的
 
 #一、Celltypist
